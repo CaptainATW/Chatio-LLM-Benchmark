@@ -1,23 +1,19 @@
-<p align="center">
-  <h1>Chatio LLM Benchmark</h1>
-  <b>A benchmark for real-world helpfulness.</b><br><br>
+<div align="center">
+  <h1>Chatio Benchmark</h1>
+  <p>
+    <b>A LLM benchmark for real-world helpfulness.</b>
+      </p>
+      <img src="assets/Model%20Radar.svg" alt="Model Card Visualization" width="75%">
+      <br><br>
   <a href="https://chatio.dev"><b>View the Live Leaderboard at chatio.dev</b></a>
-</p>
-
-<p align="center">
-  <img src="assets/Model%20Radar.svg" alt="Model Card Visualization">
-</p>
-
----
+  
+</div>
 
 ### Overview
 
 Chatio is an evaluation suite designed to measure how genuinely useful Large Language Models (LLMs) are in everyday scenarios. While traditional benchmarks often focus on math olympiad problems or obscure coding challenges, Chatio evaluates the core skills required for a high-quality AI assistant: empathy, nuance, instruction following, and clear communication.
 
 This repository contains the documentation and system card for the benchmark. To prevent test-set contamination and overfitting, the dataset itself remains closed-source.
-
-
-
 
 ### Why Chatio?
 
@@ -61,4 +57,3 @@ The Chatio Benchmark is intended for comparative evaluation and capability mappi
 ------
 
 *Created by Alex Tyh Wang.*
-*© 2025 All rights reserved.*
