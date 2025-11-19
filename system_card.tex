@@ -58,7 +58,7 @@
 % Macros
 \newcommand{\benchmark}{Chatio LLM Benchmark}
 \newcommand{\product}{Chatio}
-\newcommand{\version}{v0.9 (Draft)}
+\newcommand{\version}{v1.0 (Release)}
 
 %==============================================================================%
 % Document
@@ -74,14 +74,16 @@
 
   \begin{infobox}{At a Glance}
     \begin{itemize}
-      \item Goal: Evaluate real-world assistant usability and helpfulness across everyday tasks, not just academic proxies \cite{prompteng2024,livebench2025,e-bench2025}.
-      \item Coverage: Five categories spanning core assistant skills:
-      Emotional Support; Formatting Assistance; Creative Writing; Reading Comprehension; General Help and Knowledge.
-      \item Evaluation: Mixed-method scoring with human review and automated methods, including LLM-as-a-Judge where appropriate \cite{galileo-judge-2024,geval-2023,citadel-2024}.
-      \item Reporting: Category-level and overall normalized scores with balanced weighting.
-      \item Scope limits: English-only, single-turn prompts; text-based tasks (no code, math Olympiad, or multimodal in this version).
-      \item Update cadence: Periodic content refreshes to reduce test-set contamination and overfitting \cite{prompteng2024,livebench2025}.
-      \item Intended use: Model comparison, regression tracking, and capability mapping; not a certification for high-stakes deployment.
+      \item \textbf{Structure:} Five distinct sub-benchmarks, each targeting a specific pillar of assistant utility.
+      \item \textbf{Dataset:} ~500 closed-source prompts, synthetically generated with human verification. Created July 2025 to minimize contamination.
+      \item \textbf{Evaluation:} A hybrid pipeline using:
+        \begin{itemize}
+            \item Human Expert Review (Volunteer Team) for empathy and helpfulness.
+            \item Ensemble LLM-as-a-Judge (Claude 4.5 Sonnet + GPT-5.1) for creativity.
+            \item Deterministic/Hardcoded checks for instruction following.
+        \end{itemize}
+      \item \textbf{Scope:} English-only, single-turn/short-context interactions.
+      \item \textbf{Intended Use:} Evaluating real-world helpfulness, tone adaptation, and everyday logic; not for code generation or math olympiad capability.
     \end{itemize}
   \end{infobox}
 
@@ -94,109 +96,114 @@
 
 \section{Purpose and Scope}
 
-The \benchmark{} evaluates language models on practical, real-world tasks that reflect everyday user needs. Its focus is real-world usability: measuring how well models handle messy, open-ended user queries and typical assistant workflows, as opposed to purely laboratory-style tests. This addresses a known gap where models that score well on academic benchmarks may falter in everyday use \cite{prompteng2024,livebench2025,e-bench2025}.
+The \benchmark{} evaluates language models on practical, real-world tasks that reflect everyday user needs. Unlike academic benchmarks that prioritize rote knowledge or puzzle-solving, \product{} measures "assistant fit", or how well a model integrates into daily life. The benchmark is divided into five distinct sub-benchmarks, each providing a standalone score that contributes to the final rating.
 
-\product{} emphasizes a broad range of common assistant capabilities (from empathetic support to factual Q\&A) so that high benchmark scores translate into genuinely helpful behavior in real use. By prioritizing realistic tasks and user-centric criteria, the benchmark aims to promote AI systems that are not only technically proficient but also truly useful in day-to-day interactions.
+\section{Task Design: The Five Pillars}
 
-\section{Task Design and Coverage}
+\product{} consists of five separate testing tracks:
 
-\product{} is organized into five categories representing core assistant utility \cite{livebench2025,e-bench2025}:
+\subsection{1. Emotional Support (Human-Evaluated)}
+Models are presented with scenarios involving user distress, anxiety, or conflict.
+\begin{itemize}
+    \item \textbf{Goal:} Provide comfort and validation without sounding robotic.
+    \item \textbf{Key Metric:} Tone adaptation. Does the model shift its voice to match the severity of the situation?
+\end{itemize}
 
-\subsection{Emotional Support}
-Models provide empathetic, supportive responses to users in distress or seeking comfort. Emphasis is on emotional intelligence (e.g., validation, encouragement, active listening) and maintaining a respectful, calming tone. Success indicates the model can handle sensitive conversations with care.
+\subsection{2. Creative Writing (Ensemble AI-Evaluated)}
+Models generate original content such as short stories, emails, or dialogues based on open-ended prompts.
+\begin{itemize}
+    \item \textbf{Goal:} produce engaging, coherent, and original text.
+    \item \textbf{Key Metric:} Narrative flow and stylistic adherence.
+\end{itemize}
 
-\subsection{Formatting Assistance}
-Tasks require transforming or producing text in a specified format or style (e.g., lists, tables, Markdown/JSON). This assesses instruction-following, attention to detail, and compliance with formatting constraints helpful for email drafting, note-taking, and structured data exchange.
+\subsection{3. Instruction Following (Hybrid Hardcoded)}
+Tasks require strict adherence to constraints (e.g., "no adjectives," "JSON format only," "under 50 words").
+\begin{itemize}
+    \item \textbf{Goal:} Precision and reliability.
+    \item \textbf{Key Metric:} Constraint satisfaction rate (Pass/Fail).
+\end{itemize}
 
-\subsection{Creative Writing}
-Models generate original creative content (short stories, poems, dialogues, or imaginative scenarios). Evaluation emphasizes creativity, coherence, expression, and originality while maintaining logical flow—reflecting real use for brainstorming or entertainment.
+\subsection{4. Reading Comprehension (Hardcoded)}
+Models are given text passages and must answer specific questions or extract data.
+\begin{itemize}
+    \item \textbf{Goal:} Zero-hallucination information retrieval.
+    \item \textbf{Key Metric:} Factual accuracy and inclusion of required details.
+\end{itemize}
 
-\subsection{Reading Comprehension}
-Given a passage or article, models answer questions, summarize, or explain. This measures the ability to understand and use provided context, accurately extract information, follow narratives, and avoid hallucinations—useful for digesting news, documents, or learning materials.
-
-\subsection{General Help and Knowledge}
-Everyday informational or instructional queries across an open domain (e.g., “Fixing a leaky faucet,” “Explain X in simple terms”). This tests breadth of knowledge, reasoning, clarity, and actionable helpfulness.
-
-These categories collectively span social-emotional skills, instruction-following and formatting, creative generation, comprehension, and general reasoning, providing a well-rounded assessment and encouraging balanced model capabilities.
+\subsection{5. General Helpfulness (Dual-Faceted)}
+This category covers general knowledge explanation and real-world logistics (e.g., "How do I fix a leaky faucet?").
+\begin{itemize}
+    \item \textbf{Goal:} Actionable, clear advice.
+    \item \textbf{Key Metric:} Clarity of explanation and correctness of advice.
+\end{itemize}
 
 \section{Evaluation Methodology}
 
-\subsection{Overview}
-\product{} uses multi-faceted evaluation combining human judgment with automated metrics to balance depth (qualitative nuance) and breadth (scalable coverage). Each task instance is evaluated on criteria suited to the category.
+\product{} employs a specialized evaluation pipeline for each of the five benchmarks to ensure the scoring method matches the nature of the task.
 
-\subsection{Human Review}
-For subjective or nuanced tasks (e.g., emotional support, creative writing), trained annotators score outputs using clear rubrics. Criteria include empathy and appropriateness (support), or coherence and creativity (writing). Human judgment remains the reference standard for tone, context, and usefulness \cite{citadel-2024}. Multiple reviewers may score a sample to increase reliability. Due to time and cost, human review is applied where it adds the most value and captures subtleties automated methods may miss \cite{prompteng2024}.
-
-\subsection{Automated Evaluation}
-For structured or objective tasks, programmatic checks and LLM-based evaluators provide efficiency and consistency:
+\subsection{Empathy \& General Helpfulness: Human Pairwise Comparison}
+Subjective categories are evaluated by a dedicated team of 3--5 human volunteers (comprising the authors and CS students).
 \begin{itemize}
-  \item Rule- or reference-based checks (e.g., exact formatting compliance, string overlap for comprehension questions).
-  \item LLM-as-a-Judge: A strong model (e.g., GPT-class) is prompted to rate another model’s output on predefined criteria such as correctness, relevance, and style \cite{galileo-judge-2024,geval-2023}. Studies report useful alignment with human judgments for nuanced criteria when carefully prompted \cite{geval-2023}.
+    \item \textbf{Method:} Blind side-by-side comparison. Reviewers see the output of Model A and Model B without identifying labels.
+    \item \textbf{Criteria:} Reviewers vote on which response is more comforting (for Empathy) or more actionable (for Helpfulness).
+    \item \textbf{Nuance:} Humans specifically check for "tone adaptation"—rewarding models that sound authentic rather than using canned "I understand" templates.
 \end{itemize}
-Automated methods enable rapid, consistent scoring but can misjudge context or subtleties; their results are interpreted with caution and triangulated with human ratings where appropriate \cite{prompteng2024,citadel-2024}.
 
-\subsection{Score Aggregation and Reporting}
-For each prompt, multiple ratings (if present) are averaged to yield an instance score. Scores are then aggregated across tasks and categories. Categories are balanced (e.g., equal-weighted) so excelling in one area does not mask weaknesses elsewhere. Final results report:
+\subsection{Creative Writing: Ensemble LLM-as-a-Judge}
+Evaluating creativity is notoriously difficult for a single model due to inherent biases (e.g., one model preferring flowery language, another preferring conciseness).
 \begin{itemize}
-  \item An overall normalized score (e.g., 0–100).
-  \item Category-level scores to reveal strengths and weaknesses.
-  \item Notes on evaluation mix (human/automated) for transparency.
+    \item \textbf{Judges:} We utilize an ensemble of \textbf{Claude 4.5 Sonnet} and \textbf{GPT-5.1}.
+    \item \textbf{Rationale:} By averaging the scores of two distinct state-of-the-art models with different training lineages, we mitigate individual judge bias and achieve a more neutral, high-fidelity score.
 \end{itemize}
-This blended approach reflects emerging best practices: use automated methods for scale and consistency, validate with human review, and combine signals thoughtfully \cite{citadel-2024,prompteng2024}.
+
+\subsection{Instruction Following \& Comprehension: Programmatic Validation}
+These tasks are objective and are scored using hardcoded test suites.
+\begin{itemize}
+    \item \textbf{Method:} Python-based string parsing, Regex, and JSON validation.
+    \item \textbf{Human Fallback:} In cases where programmatic parsing fails (e.g., ambiguous formatting), the sample is flagged for human review to ensure the model is not penalized for a valid but unexpected output format.
+\end{itemize}
+
+\subsection{General Helpfulness: Two-Faceted Approach}
+This benchmark combines objective and subjective measures:
+\begin{enumerate}
+    \item \textbf{Factual Accuracy:} A question bank of real-world queries is checked for factual correctness.
+    \item \textbf{Human Preference:} The human volunteer team ranks responses based on "helpfulness"—how easy the advice is to follow for a layperson.
+\end{enumerate}
+
+\section{Test Configuration and Decontamination}
+
+To ensure fair and reproducible results, we adhere to strict configuration and data hygiene standards.
+
+\subsection{Prompt Dataset}
+\begin{itemize}
+    \item \textbf{Volume:} Approximately 500 unique prompts across the five categories.
+    \item \textbf{Origin:} Prompts are synthetically generated to ensure diversity, then manually reviewed and filtered by the human team for quality.
+    \item \textbf{Decontamination:} The dataset was created in \textbf{July 2025}. This date post-dates the training data cutoff for many current models, reducing the risk of memorization. Furthermore, the benchmark is closed-source, and evaluations are conducted via providers with zero-data-retention policies to prevent future contamination.
+\end{itemize}
+
+\subsection{Inference Settings}
+\begin{itemize}
+    \item \textbf{Temperature:} We strictly use the provider's recommended temperature settings for each model (typically range 0.7--1.0).
+    \item \textbf{Default:} If no specific recommendation exists, we default to a temperature of \textbf{1.0} to allow for natural variance in creative tasks.
+    \item \textbf{Context:} The benchmark focuses on short-context interactions typical of daily assistant usage.
+\end{itemize}
 
 \section{Ethical Considerations}
 
 \subsection{Bias and Fairness}
-LLMs can inadvertently produce biased or stereotypical content. \product{} includes tasks that surface differential treatment across genders, backgrounds, or occupations, and penalizes harmful stereotypes or discriminatory language. Human evaluators apply fairness guidelines and watch for subtle biases. Bias issues have been prominent in real deployments \cite{phare-2025}. The benchmark incentivizes equitable, respectful language across identities.
-
-\subsection{Cultural Sensitivity}
-Global assistants must handle diverse cultures without a narrow viewpoint. Many LLMs are trained primarily on English/Western data and can underperform on less-represented contexts \cite{blend-2024}. \product{} includes prompts referencing non-Western holidays, local customs, and everyday life across regions, rewarding culturally appropriate, contextually aware responses. Cultural insensitivity and stereotypes are considered failure modes \cite{blend-2024,phare-2025}.
+LLMs can inadvertently produce biased or stereotypical content. \product{} includes tasks that surface differential treatment across genders, backgrounds, or occupations. Human evaluators apply fairness guidelines and watch for subtle biases.
 
 \subsection{Safety and Harmful Content}
 The benchmark avoids tasks encouraging disallowed content. Evaluators consider safety risks; blatantly harmful or abusive responses are noted and penalized. Helpfulness must align with ethics: superior performance requires both capability and responsible behavior.
 
-\section{Limitations and Known Gaps}
-
-No benchmark covers everything; key limitations include:
+\section{Limitations}
 
 \begin{itemize}
-  \item \textbf{Scope of Tasks:} Focused on conversational, text-only assistant tasks. No explicit evaluation of software engineering, advanced math problem-solving, or multimodal understanding in this version.
-  \item \textbf{Language Coverage:} Prompts and evaluations are primarily English. Performance in other languages is not measured; multilingual variants are a planned extension.
-  \item \textbf{Dialogue Depth:} Most prompts are single-turn. Long-horizon dialogue coherence, memory, and adaptation to follow-ups are not explicitly tested.
-  \item \textbf{Evaluation Imperfections:} Human review can be subjective; automated judges can have blind spots. Clear rubrics and mixed methods reduce but do not eliminate variance \cite{galileo-judge-2024,geval-2023,citadel-2024}.
-  \item \textbf{Overfitting and Familiarity:} Public benchmarks risk test-set contamination and overfitting. \product{} mitigates with a dynamic update policy but cannot fully preclude memorization \cite{prompteng2024,livebench2025}.
+    \item \textbf{Dataset Size:} With ~500 prompts, this benchmark is smaller than massive academic datasets. It is designed as a high-quality "probe" rather than an exhaustive capabilities test.
+    \item \textbf{Scope:} Focused on English text only. No multimodal, coding, or advanced math capabilities are tested.
+    \item \textbf{Human Subjectivity:} While our volunteer team follows rubrics, human evaluation inherently contains some degree of subjectivity regarding what constitutes "helpful" or "empathetic."
 \end{itemize}
 
-Users should treat \product{} as one tool among many, complemented by domain-specific, multilingual, and multi-turn evaluations as needed.
-
-\section{Update and Versioning Policy}
-
-To remain robust and relevant, \product{} evolves over time. Task sets are periodically refreshed—adding, modifying, or retiring items—to reduce overfitting and test familiarity. This dynamic approach counters contamination as content becomes known or incorporated into training data \cite{prompteng2024,livebench2025}.
-
-Practically:
-\begin{itemize}
-  \item New tasks are introduced on a regular cadence (e.g., every few months), inspired by emerging user needs, failure modes, and under-represented scenarios.
-  \item Core domains (the five categories) remain stable; specific prompts are refreshed incrementally to preserve comparability while maintaining challenge.
-  \item Versions are documented; evaluations should cite the benchmark version used.
-  \item Updates avoid drastic domain shifts that would unfairly favor or penalize particular models.
-\end{itemize}
-
-Participants are encouraged to evaluate on the latest version and avoid hand-tuning models to prior public task sets. The goal is to measure genuine generalization and real-world utility over time \cite{livebench2025}.
-
-\section{Responsible Use and Disclosure}
-
-\begin{itemize}
-  \item \textbf{Intended Use:} Comparative evaluation of assistant-like LLMs, regression tracking, and capability mapping.
-  \item \textbf{Not Intended For:} High-stakes deployment certification, safety approval, or domain-specific compliance.
-  \item \textbf{Transparency:} Report model version, decoding parameters, and benchmark version. Include notes on human vs.\ automated evaluation proportions.
-  \item \textbf{Reproducibility:} Use provided evaluation scripts and templates when available. Random seeds and sampling settings should be documented.
-\end{itemize}
-
-\section*{Acknowledgments}
-We thank the reviewers and contributors who helped refine the task set, rubrics, and scoring pipelines.
-
-\section*{How to Cite}
-Chatio Benchmark Team. “Chatio LLM Benchmark: System Card.” \version, \today.
 
 \newpage
 \begin{thebibliography}{99}
