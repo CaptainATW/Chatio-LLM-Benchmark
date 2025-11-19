@@ -5,8 +5,9 @@
       </p>
       <img src="assets/Model%20Radar.svg" alt="Model Card Visualization" width="75%">
       <br><br>
-  <a href="https://chatio.dev"><b>View the Live Leaderboard at chatio.dev</b></a>
-  
+    <a href="https://chatio.dev"><b>View the Live Leaderboard</b></a>
+    &nbsp; | &nbsp;
+    <a href="https://github.com/CaptainATW/Chatio-LLM-Benchmark/blob/main/Chatio%20LLM%20Benchmark%20System%20Card%201.0.pdf"><b>View System Card</b></a>  
 </div>
 
 ### Overview
